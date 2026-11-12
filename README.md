@@ -28,6 +28,8 @@ who answers. Everything else about the device is TECHO5's, and its own README is
   SDK. The character is Meta's and is not in this repository.
 - **A Usage screen.** A clock style that shows meters sent from your computer, made for a Claude
   Code plan's usage. See [docs/usage-screen.md](docs/usage-screen.md).
+- **A Jolly screen.** A clock style where a character of your own walks about a room, made from one
+  picture of it seen from four sides. See [docs/jolly-screen.md](docs/jolly-screen.md).
 
 Smart home control is not part of this. The Echo is the voice. Reaching your lights and speakers is
 Muse's own business, for example through [Muse Home Link](https://gadgets.muse.ai/home-link).
@@ -90,7 +92,8 @@ On one Echo Show 5 2nd gen (cronos), in October 2026:
 Not tested: the timer, radio and screen commands (only the volume and an alarm were tried), pairing
 from Android, the Show 5 1st gen, the Show 8, the Spot and the Dot, pairing while
 Bluetooth earbuds are connected, the setup page's pairing button (pairing was done from the command
-line), and this fork with a Home Assistant server attached.
+line), this fork with a Home Assistant server attached, and the Jolly screen, which was only drawn on a
+computer.
 
 An answer took 7 to 11 seconds from the end of the question, most of it Muse thinking.
 

@@ -71,6 +71,16 @@ type Animation struct {
 // Parse reads a manifest and refuses one the player could not trust: a set missing an animation a
 // turn needs, or sizes that make no picture or too large a one.
 func Parse(b []byte) (Manifest, error) {
+	need := make([]string, 0, len(phases))
+	for _, name := range phases {
+		need = append(need, name)
+	}
+	return ParseFor(b, need)
+}
+
+// ParseFor is Parse for a set that plays something other than a turn: need names the animations it
+// has to have.
+func ParseFor(b []byte, need []string) (Manifest, error) {
 	var m Manifest
 	if err := json.Unmarshal(b, &m); err != nil {
 		return Manifest{}, fmt.Errorf("manifest: %w", err)
@@ -84,7 +94,7 @@ func Parse(b []byte) (Manifest, error) {
 	if !(m.Grid >= 0 && m.Grid <= 1) {
 		return Manifest{}, fmt.Errorf("manifest: a grid of %v", m.Grid)
 	}
-	for _, name := range phases {
+	for _, name := range need {
 		if _, ok := m.Animations[name]; !ok {
 			return Manifest{}, fmt.Errorf("manifest: no %q animation", name)
 		}

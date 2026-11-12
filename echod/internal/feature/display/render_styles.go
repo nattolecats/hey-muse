@@ -84,6 +84,11 @@ func (r *renderer) styledClock(s scene, style string) {
 		r.alertBadge(s)
 		return
 	}
+	if style == styleJolly {
+		r.jollyStyle(s)
+		r.alertBadge(s)
+		return
+	}
 	timers := false
 	for _, t := range s.timers {
 		timers = timers || t.Active

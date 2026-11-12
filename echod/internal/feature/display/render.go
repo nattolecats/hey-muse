@@ -275,6 +275,13 @@ type renderer struct {
 	// av is where the Muse character is in its animation (render_avatar.go).
 	av avatar.Playhead
 
+	// jolly is the Jolly clock style's character on its floor, and jollyAv where it is in its animation
+	// (jolly_style.go); jollyDrawn is it having been drawn in the frame last drawn, which wants the next
+	// one soon.
+	jolly      wander
+	jollyAv    avatar.Playhead
+	jollyDrawn bool
+
 	// weatherAt is where the home screen's weather was drawn in the frame last drawn, for a tap there
 	// to open the forecast; empty when it was not drawn. Written while drawing, read by the touch
 	// goroutine, so under its own lock.
@@ -415,6 +422,7 @@ func newRenderer(dst *image.RGBA) *renderer {
 // draw composes a whole frame. Everything is repainted: the canvas is small and a full paint is
 // simpler than tracking what changed.
 func (r *renderer) draw(s scene) {
+	r.jollyDrawn = false
 	if !s.showDeck {
 		// Where the deck's buttons were is nothing to tap once something else is drawn there.
 		r.zmu.Lock()

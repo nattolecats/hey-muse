@@ -1788,6 +1788,7 @@ func (d *Display) Start(context.Context) error {
 	d.wide = w > 1000 || h > 1000
 	d.mu.Unlock()
 	d.avatar = loadAvatar()
+	loadJolly()
 	d.followMeters()
 	fw, fh := dev.FrameSize()
 	video.Get().UseScreen(video.Screen{W: w, H: h, Rotated: dev.Rotated(), PixFmt: dev.PixFmt()}, fw, fh)
@@ -2228,6 +2229,9 @@ func (d *Display) frame() time.Duration {
 	}
 	if d.r.artDrawn {
 		return artFxFrame // rain or snow is falling over the weather art on the screen
+	}
+	if d.r.jollyDrawn {
+		return d.r.jollyUntil(time.Now()) // the Jolly clock style's character is walking
 	}
 	if (s.slideshow != nil || s.slideshowScreensaver != nil) && home.Get().SlideshowTransitioning() {
 		return home.SlideshowFrame

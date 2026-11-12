@@ -63,3 +63,9 @@ frames a second, four six-second clips are about 14 MB on disk and 50 MB of the 
 What makes a good video: the same framing in all four, a background that is one flat color, nothing
 of the character leaving the picture, and three to six seconds each. The videos are yours to supply
 and, like the character, are not in this repository.
+
+## A character for the Jolly clock style
+
+`make_roam_sprites.py` makes a different kind of set, for the Jolly clock style: a character that
+walks about a room in place of the clock. It works from one picture of the character seen from four
+sides. [docs/jolly-screen.md](../../docs/jolly-screen.md) says how.

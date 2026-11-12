@@ -321,3 +321,70 @@ func TestTheNextFrameIsDueOnTheClock(t *testing.T) {
 		}
 	}
 }
+
+// A set that plays something other than a turn is asked for its own animations, and not for a turn's.
+func TestASetIsAskedForTheAnimationsItsUseNeeds(t *testing.T) {
+	if _, err := ParseFor([]byte(good), []string{Idle, "walking"}); err == nil {
+		t.Error("a set with no walking was accepted for a use that needs it")
+	}
+	walker := strings.NewReplacer(`"listening"`, `"walking"`, `"thinking"`, `"running"`, `"talking"`, `"sitting"`).Replace(good)
+	if _, err := ParseFor([]byte(walker), []string{Idle, "walking"}); err != nil {
+		t.Errorf("a set with what its use needs was refused: %v", err)
+	}
+	if _, err := Parse([]byte(walker)); err == nil {
+		t.Error("a set with no turn's animations was accepted for a turn")
+	}
+	if _, err := LoadFor(writeSet(t), []string{Idle, "walking"}); err == nil {
+		t.Error("a folder with no walking was loaded for a use that needs it")
+	}
+}
+
+// A frame is drawn at any size: its color where the frame is solid, nothing where it is clear, and
+// only the part of it that lands on the canvas.
+func TestAFrameIsDrawnAtAnySize(t *testing.T) {
+	s, err := LoadFor(writeSet(t), []string{Talking})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ground := color.RGBA{1, 2, 3, 255}
+	canvas := func() *image.RGBA {
+		dst := image.NewRGBA(image.Rect(0, 0, 20, 20))
+		for i := 0; i < len(dst.Pix); i += 4 {
+			dst.Pix[i], dst.Pix[i+1], dst.Pix[i+2], dst.Pix[i+3] = ground.R, ground.G, ground.B, ground.A
+		}
+		return dst
+	}
+	dst := canvas()
+	s.DrawScaled(dst, image.Rect(3, 3, 14, 14), Talking, 2)
+	for p, want := range map[image.Point]color.RGBA{
+		{2, 2}:   ground,             // outside the box
+		{3, 3}:   ground,             // the frame's clear corner
+		{13, 13}: {200, 200, 0, 255}, // the far corner, solid
+		{13, 4}:  {200, 200, 0, 255},
+		{14, 14}: ground, // past the box
+	} {
+		if got := dst.RGBAAt(p.X, p.Y); got != want {
+			t.Errorf("the pixel at %v is %v, want %v", p, got, want)
+		}
+	}
+	// Between the clear corner and the solid rest the color comes in by degrees, and it is the frame's
+	// own color that does: no black from the clear pixel.
+	if got := dst.RGBAAt(7, 7); got.R <= ground.R || got.R >= 200 || got.B > ground.B {
+		t.Errorf("the pixel between clear and solid is %v", got)
+	}
+
+	// Hanging off the canvas, what is on it is drawn and nothing is written past it.
+	dst = canvas()
+	s.DrawScaled(dst, image.Rect(-20, -20, 20, 20), Talking, 0)
+	if got := dst.RGBAAt(19, 19); got != (color.RGBA{200, 0, 0, 255}) {
+		t.Errorf("the part of a frame that is on the canvas is %v", got)
+	}
+	dst = canvas()
+	s.DrawScaled(dst, image.Rect(-30, -30, -2, -2), Talking, 0)
+	s.DrawScaled(dst, image.Rect(5, 5, 5, 9), Talking, 0)
+	s.DrawScaled(dst, image.Rect(0, 0, 9, 9), Talking, 3)
+	s.DrawScaled(dst, image.Rect(0, 0, 9, 9), "dancing", 0)
+	if got := dst.RGBAAt(0, 0); got != ground {
+		t.Errorf("a frame that is nowhere, or no frame, drew %v", got)
+	}
+}
