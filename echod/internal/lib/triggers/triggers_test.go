@@ -13,6 +13,7 @@ var spoken = map[string]struct{ weather, radar, home, camera string }{
 	"fr": {"Quel temps fait-il ?", "Montre la carte des pluies", "Retour à l'horloge", "Montre la porte d'entrée"},
 	"it": {"Che tempo fa?", "Mostra la mappa della pioggia", "Torna all'orologio", "Mostra la porta d'ingresso"},
 	"nl": {"Hoe is het weer?", "Laat de buienradar zien", "Terug naar de klok", "Laat de voordeur zien"},
+	"ja": {"今日の天気は？", "雨雲レーダーを見せて", "ホーム画面に戻って", "玄関のカメラを見せて"},
 }
 
 // Each language's own sentences bring up what they ask for, both when that language is chosen and

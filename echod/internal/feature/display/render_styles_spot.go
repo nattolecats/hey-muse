@@ -12,13 +12,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/HuskerMinion/techo5/echod/internal/lib/locale"
 	xdraw "golang.org/x/image/draw"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/gofont/gobold"
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
+
+	"github.com/HuskerMinion/techo5/echod/internal/lib/cjk"
+	"github.com/HuskerMinion/techo5/echod/internal/lib/locale"
 )
 
 // The Spot's clock styles other than the classic face (clock_style.go), laid out for the circle. The
@@ -55,11 +57,12 @@ func (r *roundRenderer) styleFace(bold bool, size int) font.Face {
 	if src == nil {
 		return r.small
 	}
-	f, err := opentype.NewFace(src, &opentype.FaceOptions{Size: float64(px), DPI: 72, Hinting: font.HintingFull})
+	made, err := opentype.NewFace(src, &opentype.FaceOptions{Size: float64(px), DPI: 72, Hinting: font.HintingFull})
 	if err != nil {
 		slog.Error("making a clock style's face failed", "size", px, "err", err)
 		return r.small
 	}
+	f := cjk.Face(made, float64(px))
 	if r.styleFaces == nil || len(r.styleFaces) > 24 {
 		r.styleFaces = map[spotFaceKey]font.Face{}
 	}

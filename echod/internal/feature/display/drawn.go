@@ -5,7 +5,6 @@ package display
 import (
 	"image"
 	"log/slog"
-	"strings"
 	"sync"
 
 	"golang.org/x/image/font"
@@ -14,6 +13,7 @@ import (
 	"golang.org/x/image/font/opentype"
 
 	"github.com/HuskerMinion/techo5/echod/internal/feature/dashboard"
+	"github.com/HuskerMinion/techo5/echod/internal/lib/cjk"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/mdi"
 )
 
@@ -78,10 +78,11 @@ func (r *paint) textFace(bold bool, size int) font.Face {
 	if fc, ok := textFaces.Load(key); ok {
 		return fc.(font.Face)
 	}
-	fc, err := opentype.NewFace(f, &opentype.FaceOptions{Size: float64(key.px), DPI: 72, Hinting: font.HintingFull})
+	made, err := opentype.NewFace(f, &opentype.FaceOptions{Size: float64(key.px), DPI: 72, Hinting: font.HintingFull})
 	if err != nil {
 		return nil
 	}
+	fc := cjk.Face(made, float64(key.px))
 	textFaces.Store(key, fc)
 	return fc
 }
@@ -115,11 +116,8 @@ func (r *paint) iconFace(size int) font.Face {
 func (r *paint) wrapLines(face font.Face, text string, w int) []string {
 	var lines []string
 	line := ""
-	for _, word := range strings.Fields(text) {
-		try := word
-		if line != "" {
-			try = line + " " + word
-		}
+	for _, word := range breakable(text) {
+		try := joinWord(line, word)
 		if line != "" && r.width(face, try) > w {
 			lines = append(lines, line)
 			line = word

@@ -31,6 +31,7 @@ import (
 	"github.com/HuskerMinion/techo5/echod/internal/feature/timer"
 	"github.com/HuskerMinion/techo5/echod/internal/feature/video"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/avatar"
+	"github.com/HuskerMinion/techo5/echod/internal/lib/cjk"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/hass"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/locale"
 )
@@ -401,7 +402,7 @@ func newRenderer(dst *image.RGBA) *renderer {
 			slog.Error("making a font face failed", "size", size, "err", err)
 			return nil
 		}
-		return fc
+		return cjk.Face(fc, float64(r.s(size)))
 	}
 	r.clock = face(bold, 230)
 	r.big = face(bold, 100)

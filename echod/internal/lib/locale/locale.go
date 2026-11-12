@@ -1,5 +1,5 @@
 // Package locale writes the dates and weather words the screen shows in the screen's language: the
-// clock's day and date, the forecast's day names, and what the sky is doing. Six languages, the ones
+// clock's day and date, the forecast's day names, and what the sky is doing. Seven languages, the ones
 // the screen's Language setting offers; anything else, empty included, is English.
 //
 // Only those words. The rest of the screen's own text - its settings, its buttons - is English.
@@ -80,6 +80,21 @@ var langs = map[string]*words{
 			"sunny": "Zonnig", "windy": "Winderig", "windy-variant": "Winderig",
 		},
 	},
+	// Japanese writes a date in its own order, month and day and then the day's name, and its months
+	// are numbers: the date functions below each say how. The screen draws it with a font of its own
+	// (lib/cjk).
+	"ja": {
+		days:        [7]string{"日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"},
+		shortDays:   [7]string{"日", "月", "火", "水", "木", "金", "土"},
+		months:      [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
+		shortMonths: [12]string{"1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"},
+		sky: map[string]string{
+			"clear-night": "晴れ", "cloudy": "くもり", "exceptional": "荒天", "fog": "霧", "hail": "ひょう",
+			"lightning": "雷", "lightning-rainy": "雷雨", "partlycloudy": "晴れ時々くもり",
+			"pouring": "大雨", "rainy": "雨", "snowy": "雪", "snowy-rainy": "みぞれ",
+			"sunny": "晴れ", "windy": "強風", "windy-variant": "強風",
+		},
+	},
 }
 
 // phrases are the few words written beside a date: today, as the forecast heads its first day, and
@@ -103,6 +118,9 @@ var phrases = map[string]map[string]string{
 	"nl": {"here": "Hier", "today": "Vandaag", "alarm": "Wekker", "snoozed": "Sluimeren tot", "tomorrow": "Morgen", "yesterday": "Gisteren",
 		"now": "Nu", "allday": "Hele dag", "nothing": "Niets in de agenda", "nothingtoday": "Niets vandaag",
 		"nothingelse": "Verder niets vandaag"},
+	"ja": {"here": "現在地", "today": "今日", "alarm": "アラーム", "snoozed": "スヌーズ", "tomorrow": "明日", "yesterday": "昨日",
+		"now": "今", "allday": "終日", "nothing": "予定はありません", "nothingtoday": "今日の予定はありません",
+		"nothingelse": "今日はもう予定はありません", "nocharacter": "キャラクターが入っていません"},
 }
 
 // Here is the World clock's own place.
@@ -124,6 +142,9 @@ func NothingElse(lang string) string  { return phrase(lang, "nothingelse", "Noth
 
 // Today is "Today", as the forecast heads its first day.
 func Today(lang string) string { return phrase(lang, "today", "Today") }
+
+// NoCharacter is what the Jolly clock style says in place of its character when none is installed.
+func NoCharacter(lang string) string { return phrase(lang, "nocharacter", "No character installed") }
 
 // Alarm is "Alarm", and snoozed "Snoozed until", before the next alarm's time after the clock's date.
 func Alarm(lang string, snoozed bool) string {
@@ -158,7 +179,7 @@ func up(s string) string {
 func day(t time.Time) string { return strconv.Itoa(t.Day()) }
 
 // LongDate is the clock's date: "Monday, January 2", "Montag, 2. Januar", "Lunes, 2 de enero",
-// "Lundi 2 janvier", "Lunedì 2 gennaio", "Maandag 2 januari".
+// "Lundi 2 janvier", "Lunedì 2 gennaio", "Maandag 2 januari", "1月2日 月曜日".
 func LongDate(t time.Time, lang string) string {
 	w, ok := langs[lang]
 	if !ok {
@@ -170,11 +191,13 @@ func LongDate(t time.Time, lang string) string {
 		return up(d) + ", " + day(t) + ". " + m
 	case "es":
 		return up(d) + ", " + day(t) + " de " + m
+	case "ja":
+		return m + day(t) + "日 " + d
 	}
 	return up(d) + " " + day(t) + " " + m
 }
 
-// ShortDate is the date where there is less room: "Mon, Jan 2", "Mo., 2. Jan.", "Lun, 2 ene".
+// ShortDate is the date where there is less room: "Mon, Jan 2", "Mo., 2. Jan.", "Lun, 2 ene", "1月2日(月)".
 func ShortDate(t time.Time, lang string) string {
 	w, ok := langs[lang]
 	if !ok {
@@ -186,6 +209,8 @@ func ShortDate(t time.Time, lang string) string {
 		return up(d) + "., " + day(t) + ". " + m
 	case "es":
 		return up(d) + ", " + day(t) + " " + m
+	case "ja":
+		return m + day(t) + "日(" + d + ")"
 	}
 	return up(d) + " " + day(t) + " " + m
 }
@@ -218,12 +243,27 @@ func MonthDay(t time.Time, lang string) string {
 		return day(t) + ". " + m
 	case "es":
 		return day(t) + " de " + m
+	case "ja":
+		return m + day(t) + "日"
 	}
 	return day(t) + " " + m
 }
 
-// DayAndNumber is the shortest date, a day's name and its number: "Mon 2", "Mo 2", "Lun 2".
+// WeekdayAndDate is the day's name and the date after a comma, where they are one line of a list:
+// "Monday, January 2", "Lundi, 2 janvier". Japanese, which puts the day last and uses no comma, has
+// its own long date.
+func WeekdayAndDate(t time.Time, lang string) string {
+	if lang == "ja" {
+		return LongDate(t, lang)
+	}
+	return Weekday(t, lang) + ", " + MonthDay(t, lang)
+}
+
+// DayAndNumber is the shortest date, a day's name and its number: "Mon 2", "Mo 2", "Lun 2", "2日(月)".
 func DayAndNumber(t time.Time, lang string) string {
+	if lang == "ja" {
+		return day(t) + "日(" + ShortWeekday(t, lang) + ")"
+	}
 	return ShortWeekday(t, lang) + " " + day(t)
 }
 

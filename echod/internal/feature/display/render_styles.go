@@ -17,6 +17,7 @@ import (
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/image/font/opentype"
 
+	"github.com/HuskerMinion/techo5/echod/internal/lib/cjk"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/hass"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/locale"
 )
@@ -57,11 +58,12 @@ func (r *renderer) styleFace(bold bool, size int) font.Face {
 	if src == nil {
 		return r.small
 	}
-	f, err := opentype.NewFace(src, &opentype.FaceOptions{Size: float64(px), DPI: 72, Hinting: font.HintingFull})
+	made, err := opentype.NewFace(src, &opentype.FaceOptions{Size: float64(px), DPI: 72, Hinting: font.HintingFull})
 	if err != nil {
 		slog.Error("making a clock style's face failed", "size", px, "err", err)
 		return r.small
 	}
+	f := cjk.Face(made, float64(px))
 	if r.styleFaces == nil || len(r.styleFaces) > 24 {
 		r.styleFaces = map[styleFaceKey]font.Face{}
 	}

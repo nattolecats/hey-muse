@@ -17,6 +17,7 @@ func TestDates(t *testing.T) {
 		{"fr", "Lundi 5 janvier", "Lun. 5 janv.", "5 janvier", "Lun. 5"},
 		{"it", "Lunedì 5 gennaio", "Lun 5 gen", "5 gennaio", "Lun 5"},
 		{"nl", "Maandag 5 januari", "Ma 5 jan", "5 januari", "Ma 5"},
+		{"ja", "1月5日 月曜日", "1月5日(月)", "1月5日", "5日(月)"},
 	} {
 		if got := LongDate(mon, c.lang); got != c.long {
 			t.Errorf("%q long: %q, want %q", c.lang, got, c.long)
@@ -33,6 +34,10 @@ func TestDates(t *testing.T) {
 	}
 	if Today("") != "Today" || Today("nl") != "Vandaag" || Alarm("de", false) != "Wecker" || Alarm("", true) != "Snoozed until" {
 		t.Errorf("phrases: %q %q %q %q", Today(""), Today("nl"), Alarm("de", false), Alarm("", true))
+	}
+	if a, b, c := WeekdayAndDate(mon, ""), WeekdayAndDate(mon, "fr"), WeekdayAndDate(mon, "ja"); a != "Monday, January 5" ||
+		b != "Lundi, 5 janvier" || c != "1月5日 月曜日" {
+		t.Errorf("the day and the date on one line: %q %q %q", a, b, c)
 	}
 	if got := Weekday(mon.AddDate(0, 0, 2), "it"); got != "Mercoledì" {
 		t.Errorf("Italian Wednesday: %q", got)
@@ -60,6 +65,13 @@ func TestSky(t *testing.T) {
 	if got := Sky("partlycloudy", "it"); got != "Parzialmente nuvoloso" {
 		t.Errorf("Italian partly cloudy: %q", got)
 	}
+	if got := Sky("partlycloudy-night", "ja"); got != "晴れ時々くもり" {
+		t.Errorf("Japanese partly cloudy at night: %q", got)
+	}
+	if Weekday(time.Date(2026, 11, 12, 0, 0, 0, 0, time.UTC), "ja") != "木曜日" || Alarm("ja", false) != "アラーム" ||
+		NoCharacter("ja") != "キャラクターが入っていません" || NoCharacter("de") != "No character installed" {
+		t.Error("Japanese words")
+	}
 	if got := Sky("tornado", "de"); got != "Tornado" {
 		t.Errorf("an unnamed condition: %q", got)
 	}
@@ -71,7 +83,7 @@ func TestTheClockStylesWords(t *testing.T) {
 		"": {"Tomorrow", "All day", "Nothing on the calendar"}, "de": {"Morgen", "Ganztägig", "Keine Termine"},
 		"es": {"Mañana", "Todo el día", "Nada en el calendario"}, "fr": {"Demain", "Toute la journée", "Rien au calendrier"},
 		"it": {"Domani", "Tutto il giorno", "Niente in calendario"}, "nl": {"Morgen", "Hele dag", "Niets in de agenda"},
-		"xx": {"Tomorrow", "All day", "Nothing on the calendar"},
+		"xx": {"Tomorrow", "All day", "Nothing on the calendar"}, "ja": {"明日", "終日", "予定はありません"},
 	} {
 		if got := [3]string{Tomorrow(lang), AllDay(lang), NothingOn(lang)}; got != want {
 			t.Errorf("%q: %q, want %q", lang, got, want)

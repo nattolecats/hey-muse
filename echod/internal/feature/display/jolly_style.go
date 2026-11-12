@@ -12,6 +12,7 @@ import (
 
 	"github.com/HuskerMinion/techo5/echod/internal/layout"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/avatar"
+	"github.com/HuskerMinion/techo5/echod/internal/lib/locale"
 )
 
 // The Jolly clock style: a character walking about a room, with the time in a corner of the wall
@@ -199,7 +200,7 @@ func (r *renderer) jollyStyle(s scene) {
 
 	set := jollySet()
 	if set == nil {
-		const none = "No character installed"
+		none := locale.NoCharacter(screenLang())
 		r.text(r.small, none, (r.w-r.width(r.small, none))/2, r.h*3/4, jollyFaint)
 	} else {
 		r.jolly.move(s.now, float64(r.w)/float64(r.h))

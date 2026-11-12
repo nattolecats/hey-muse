@@ -191,3 +191,9 @@ Test audio, echod/internal/lib/denoise/testdata (not shipped in any release)
   https://github.com/TaterTotterson/microWakeWord-Trainer-AppleSilicon on microWakeWord (Apache
   License 2.0, Kevin Ahrendt), from synthetic speech and the datasets tools/wake/README.md lists.
   None of those recordings is in this repository.
+
+Japanese font, echod/internal/lib/cjk/NotoSansJP-subset.ttf
+  A part of Noto Sans JP (https://fonts.google.com/noto/specimen/Noto+Sans+JP), Copyright 2014-2021
+  Adobe, under the SIL Open Font License 1.1, which is beside it as OFL.txt. It is one weight of the
+  font, Medium, and the characters of JIS X 0208, made by tools/fonts/make_jp_font.py. It is built into
+  the daemon, so every image carries it.

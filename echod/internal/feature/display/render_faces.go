@@ -99,7 +99,7 @@ func (r *renderer) worldStyle(s scene, box image.Rectangle) {
 		room := tx - box.Min.X - r.s(24)
 		day := w.day
 		if w.here {
-			day = locale.Weekday(s.now, screenLang()) + ", " + locale.MonthDay(s.now, screenLang()) + alarmSuffix(s)
+			day = locale.WeekdayAndDate(s.now, screenLang()) + alarmSuffix(s)
 		}
 		if w.here {
 			// Here is today: its date opens the calendar, as the date does on the other styles.

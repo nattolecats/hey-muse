@@ -81,6 +81,16 @@ var Languages = map[string]Set{
 		GoHome: []string{"beginscherm", "startscherm", "terug naar de klok", "laat de klok zien"},
 		Camera: []string{"laat", "toon", "camera"},
 	},
+	// Japanese has no spaces to find a word between, which suits a table matched anywhere in what was
+	// heard. A recognizer may write a word in kana or in kanji, so the common ones are here both ways.
+	"ja": {
+		Weather: []string{"天気", "てんき", "予報", "気温", "何度", "雨", "雪", "台風", "暑い", "寒い", "晴れ", "曇", "くもり",
+			"傘", "レーダー"},
+		Radar:      []string{"レーダー", "雨雲", "天気図"},
+		NotWeather: []string{"雨の音", "雨音", "雪の音"},
+		GoHome:     []string{"ホーム画面", "ホームに戻", "時計に戻", "時計を表示", "時計を見せ", "時計画面"},
+		Camera:     []string{"見せて", "みせて", "映して", "うつして", "表示", "カメラ"},
+	},
 }
 
 // MatchAll is the Language setting that consults every table, as this behaved before the tables

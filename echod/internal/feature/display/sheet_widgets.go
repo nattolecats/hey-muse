@@ -7,7 +7,6 @@ import (
 	"image/color"
 	"math"
 	"slices"
-	"strings"
 	"sync"
 
 	"golang.org/x/image/font"
@@ -15,6 +14,8 @@ import (
 	"golang.org/x/image/font/gofont/goregular"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/math/fixed"
+
+	"github.com/HuskerMinion/techo5/echod/internal/lib/cjk"
 )
 
 // The settings screen's parts, shared by the Show and the Spot: its categories, rows and their
@@ -156,11 +157,8 @@ func (r *paint) width(face font.Face, s string) int {
 func (r *paint) wrap(face font.Face, s string, maxW int) []string {
 	var lines []string
 	var line string
-	for _, word := range strings.Fields(s) {
-		try := word
-		if line != "" {
-			try = line + " " + word
-		}
+	for _, word := range breakable(s) {
+		try := joinWord(line, word)
 		if line != "" && r.width(face, try) > maxW {
 			lines = append(lines, line)
 			line = word
@@ -362,7 +360,7 @@ func sheetFacesAt(s func(int) int) sheetFaces {
 	regular, _ := opentype.Parse(goregular.TTF)
 	f := func(fn *opentype.Font, size int) font.Face {
 		fc, _ := opentype.NewFace(fn, &opentype.FaceOptions{Size: float64(s(size)), DPI: 72, Hinting: font.HintingFull})
-		return fc
+		return cjk.Face(fc, float64(s(size)))
 	}
 	return sheetFaces{
 		header: f(bold, 36), label: f(regular, 29), labelBold: f(bold, 29), sub: f(regular, 21),

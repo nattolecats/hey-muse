@@ -28,6 +28,10 @@ who answers. Everything else about the device is TECHO5's, and its own README is
   SDK. The character is Meta's and is not in this repository.
 - **A Usage screen.** A clock style that shows meters sent from your computer, made for a Claude
   Code plan's usage. See [docs/usage-screen.md](docs/usage-screen.md).
+- **Japanese on the screen.** 日本語 is one more Screen language: the date, the weather's words and
+  the words beside them are Japanese, and so is what brings up the weather or the clock when said.
+  The screen draws kana and kanji anywhere, in an answer, a song's title or an event's name, from a
+  part of Noto Sans JP built in. The settings and buttons stay English, as in every language.
 - **A Jolly screen.** A clock style where a character of your own walks about a room, made from one
   picture of it seen from four sides. See [docs/jolly-screen.md](docs/jolly-screen.md).
 
@@ -92,8 +96,8 @@ On one Echo Show 5 2nd gen (cronos), in October 2026:
 Not tested: the timer, radio and screen commands (only the volume and an alarm were tried), pairing
 from Android, the Show 5 1st gen, the Show 8, the Spot and the Dot, pairing while
 Bluetooth earbuds are connected, the setup page's pairing button (pairing was done from the command
-line), this fork with a Home Assistant server attached, and the Jolly screen, which was only drawn on a
-computer.
+line), this fork with a Home Assistant server attached, and the Jolly screen and Japanese on the screen,
+which were only drawn on a computer.
 
 An answer took 7 to 11 seconds from the end of the question, most of it Muse thinking.
 

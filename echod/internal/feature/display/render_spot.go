@@ -8,7 +8,6 @@ import (
 	"image/color"
 	"image/draw"
 	"math"
-	"strings"
 	"time"
 
 	"golang.org/x/image/font"
@@ -25,6 +24,7 @@ import (
 	"github.com/HuskerMinion/techo5/echod/internal/feature/talkback"
 	"github.com/HuskerMinion/techo5/echod/internal/feature/timer"
 	"github.com/HuskerMinion/techo5/echod/internal/feature/video"
+	"github.com/HuskerMinion/techo5/echod/internal/lib/cjk"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/hass"
 	"github.com/HuskerMinion/techo5/echod/internal/lib/locale"
 )
@@ -272,7 +272,7 @@ func newRoundRenderer(dst *image.RGBA) *roundRenderer {
 		if err != nil {
 			panic(err)
 		}
-		return fc
+		return cjk.Face(fc, size)
 	}
 	return &roundRenderer{
 		paint: paint{dst: dst, w: side, h: side, fc: spotFaces(), round: true},
@@ -696,13 +696,13 @@ func (r *roundRenderer) centered(face font.Face, s string, baseline int, c color
 // centered. It returns the baseline after the last line.
 func (r *roundRenderer) paragraph(face font.Face, s string, baseline int, c color.Color, maxLines int) int {
 	lineH := face.Metrics().Height.Round() + 4
-	words := strings.Fields(s)
+	words := breakable(s)
 	for n := 0; n < maxLines && len(words) > 0; n++ {
 		avail := chord(baseline-10) - 56
 		line := words[0]
 		k := 1
 		for ; k < len(words); k++ {
-			try := line + " " + words[k]
+			try := joinWord(line, words[k])
 			if r.width(face, try) > avail {
 				break
 			}
